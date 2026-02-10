@@ -1,25 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Eye, FileDown, User } from "lucide-react";
+import { Search, Eye, FileDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import PaginatedTable from "../../components/PaginatedTable";
 
-// ✅ Dynamic map imports
+// ✅ Dynamic map imports with proper typing
 const MapContainer = dynamic(
-  () => import("react-leaflet").then((m) => m.MapContainer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.MapContainer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const TileLayer = dynamic(
-  () => import("react-leaflet").then((m) => m.TileLayer),
+  () => import("react-leaflet").then((m) => m.TileLayer as React.ComponentType<any>),
   { ssr: false }
 );
 const Marker = dynamic(
-  () => import("react-leaflet").then((m) => m.Marker),
+  () => import("react-leaflet").then((m) => m.Marker as React.ComponentType<any>),
   { ssr: false }
 );
 const Popup = dynamic(
-  () => import("react-leaflet").then((m) => m.Popup),
+  () => import("react-leaflet").then((m) => m.Popup as React.ComponentType<any>),
   { ssr: false }
 );
 
@@ -32,7 +35,7 @@ export default function AllOrdersPage() {
   const [openMap, setOpenMap] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  // ✅ Sample orders with rider details
+  // ✅ Orders data
   const [orders, setOrders] = useState([
     {
       id: "ORD10231",
@@ -48,7 +51,7 @@ export default function AllOrdersPage() {
       orderDate: "01/25/2026",
       deliveryDate: "01/25/2026",
       status: "Out for Delivery",
-      location: { lat: 28.567, lng: 77.210 },
+      location: { lat: 28.567, lng: 77.21 },
       rider: {
         name: "Rohit Yadav",
         phone: "+91 9870001111",
@@ -72,7 +75,7 @@ export default function AllOrdersPage() {
       rider: {
         name: "Deepak Singh",
         phone: "+91 9823456789",
-        location: { lat: 28.460, lng: 77.065 },
+        location: { lat: 28.46, lng: 77.065 },
       },
     },
     {
@@ -112,14 +115,11 @@ export default function AllOrdersPage() {
     const matchesSearch =
       o.id.toLowerCase().includes(search.toLowerCase()) ||
       o.customer.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus =
-      selectedStatus === "All" || o.status === selectedStatus;
+    const matchesStatus = selectedStatus === "All" || o.status === selectedStatus;
     const orderDate = new Date(o.orderDate);
     const from = fromDate ? new Date(fromDate) : null;
     const to = toDate ? new Date(toDate) : null;
-    const matchesDate =
-      (!from || orderDate >= from) && (!to || orderDate <= to);
-
+    const matchesDate = (!from || orderDate >= from) && (!to || orderDate <= to);
     return matchesSearch && matchesStatus && matchesDate;
   });
 
@@ -136,8 +136,7 @@ export default function AllOrdersPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-      
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
               Out for Delivery Orders
@@ -169,7 +168,7 @@ export default function AllOrdersPage() {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
             >
-              <option>All Status</option>
+              <option>All</option>
               <option>Pending</option>
               <option>Preparing</option>
               <option>Out for Delivery</option>
@@ -213,13 +212,8 @@ export default function AllOrdersPage() {
               data={filtered}
               defaultRows={5}
               renderRow={(o) => (
-                <tr
-                  key={o.id}
-                  className="border-b last:border-0 hover:bg-gray-50 transition"
-                >
-                  <td className="px-4 py-3 font-semibold text-gray-800">
-                    {o.id}
-                  </td>
+                <tr key={o.id} className="border-b last:border-0 hover:bg-gray-50 transition">
+                  <td className="px-4 py-3 font-semibold text-gray-800">{o.id}</td>
                   <td className="px-4 py-3 text-gray-800">
                     {o.customer}
                     <br />
@@ -279,9 +273,7 @@ export default function AllOrdersPage() {
         <div className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm">
           <div className="bg-white w-full sm:w-[460px] h-full shadow-xl p-6 flex flex-col animate-slideIn">
             <div className="flex items-center justify-between mb-4 border-b pb-3">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Order Details
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-800">Order Details</h2>
               <button
                 onClick={() => setOpenDrawer(false)}
                 className="p-2 hover:bg-gray-100 rounded-full"
@@ -294,31 +286,24 @@ export default function AllOrdersPage() {
               <p><strong>Order ID:</strong> {selectedOrder.id}</p>
               <p><strong>Customer:</strong> {selectedOrder.customer} ({selectedOrder.phone})</p>
               <p><strong>Address:</strong> {selectedOrder.address}</p>
-
               <p><strong>Rider:</strong> {selectedOrder.rider.name} ({selectedOrder.rider.phone})</p>
 
               <p><strong>Items:</strong></p>
               <div className="flex flex-wrap gap-2 mb-3">
                 {selectedOrder.items.map((item: any, i: number) => (
-                  <div
-                    key={i}
-                    className="flex flex-col items-center p-2 border rounded-md w-[80px]"
-                  >
+                  <div key={i} className="flex flex-col items-center p-2 border rounded-md w-[80px]">
                     <img
                       src={item.img}
                       alt={item.name}
                       className="w-12 h-12 object-cover rounded-md"
                     />
                     <p className="text-xs text-center mt-1">{item.name}</p>
-                    <span className="text-[10px] text-gray-500">
-                      Qty: {item.qty}
-                    </span>
+                    <span className="text-[10px] text-gray-500">Qty: {item.qty}</span>
                   </div>
                 ))}
               </div>
 
               <p><strong>Payment:</strong> {selectedOrder.payment}</p>
-
               <p className="flex items-center gap-2">
                 <strong>Status:</strong>
                 <select
@@ -333,25 +318,46 @@ export default function AllOrdersPage() {
                   <option>Cancelled</option>
                 </select>
               </p>
-
-              <p><strong>Total:</strong> <span className="font-semibold text-gray-900">₹{selectedOrder.total}</span></p>
+              <p>
+                <strong>Total:</strong>{" "}
+                <span className="font-semibold text-gray-900">
+                  ₹{selectedOrder.total}
+                </span>
+              </p>
             </div>
 
-            {/* Map Section */}
+            {/* Map */}
             <div className="flex-1 border rounded-lg overflow-hidden relative">
               <MapContainer
-                center={[selectedOrder.location.lat, selectedOrder.location.lng]}
+                center={
+                  [selectedOrder.location.lat, selectedOrder.location.lng] as [
+                    number,
+                    number
+                  ]
+                }
                 zoom={14}
                 scrollWheelZoom={false}
                 className="h-[260px] w-full"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {/* Customer marker */}
-                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng]}>
+                <Marker
+                  position={
+                    [selectedOrder.location.lat, selectedOrder.location.lng] as [
+                      number,
+                      number
+                    ]
+                  }
+                >
                   <Popup>Customer: {selectedOrder.customer}</Popup>
                 </Marker>
-                {/* Rider marker */}
-                <Marker position={[selectedOrder.rider.location.lat, selectedOrder.rider.location.lng]}>
+                <Marker
+                  position={
+                    [
+                      selectedOrder.rider.location.lat,
+                      selectedOrder.rider.location.lng,
+                    ] as [number, number]
+                  }
+                >
                   <Popup>Rider: {selectedOrder.rider.name}</Popup>
                 </Marker>
               </MapContainer>
@@ -391,18 +397,35 @@ export default function AllOrdersPage() {
             </h3>
             <div className="h-[350px] border rounded-lg overflow-hidden">
               <MapContainer
-                center={[selectedOrder.location.lat, selectedOrder.location.lng]}
+                center={
+                  [selectedOrder.location.lat, selectedOrder.location.lng] as [
+                    number,
+                    number
+                  ]
+                }
                 zoom={14}
                 scrollWheelZoom={false}
                 className="h-full w-full"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {/* Customer marker */}
-                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng]}>
+                <Marker
+                  position={
+                    [selectedOrder.location.lat, selectedOrder.location.lng] as [
+                      number,
+                      number
+                    ]
+                  }
+                >
                   <Popup>Customer: {selectedOrder.customer}</Popup>
                 </Marker>
-                {/* Rider marker */}
-                <Marker position={[selectedOrder.rider.location.lat, selectedOrder.rider.location.lng]}>
+                <Marker
+                  position={
+                    [
+                      selectedOrder.rider.location.lat,
+                      selectedOrder.rider.location.lng,
+                    ] as [number, number]
+                  }
+                >
                   <Popup>Rider: {selectedOrder.rider.name}</Popup>
                 </Marker>
               </MapContainer>

@@ -1,30 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
- UserCheck,
- Users,
- Calendar,
- BookOpen,
+  UserCheck,
+  Users,
+  Calendar,
+  BookOpen,
   Settings,
   LogOut,
   ChevronDown,
   ChevronUp,
- Sparkles,
- IndianRupee,
+  Sparkles,
+  IndianRupee,
   Layers,
   User,
   Cpu,
-  MapPin,
   Bell,
-  Gift,
-  Star,
   MessageCircle,
-  Repeat
 } from "lucide-react";
 import { useState, useEffect } from "react";
+
+/* ✅ Add prop type */
+interface SidebarProps {
+  activePath: string;
+}
 
 interface NavItem {
   href?: string;
@@ -33,6 +34,7 @@ interface NavItem {
   submenu?: { href: string; label: string }[];
 }
 
+/* ✅ Keep all your menu structure */
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 
@@ -76,8 +78,6 @@ const navItems: NavItem[] = [
     ],
   },
 
-
-
   {
     label: "Pooja & Remedies",
     icon: Sparkles,
@@ -106,10 +106,9 @@ const navItems: NavItem[] = [
       { href: "/dashboard/banners", label: "Banners" },
       { href: "/dashboard/faqs", label: "FAQs" },
       { href: "/dashboard/testimonials", label: "Testimonials" },
-       { href: "/dashboard/Policy", label: "Terms & Policy" },
-       { href: "/dashboard/Support", label: "Support" },
-        { href: "/dashboard/AboutApp", label: "About App" },
-        
+      { href: "/dashboard/Policy", label: "Terms & Policy" },
+      { href: "/dashboard/Support", label: "Support" },
+      { href: "/dashboard/AboutApp", label: "About App" },
     ],
   },
 
@@ -131,8 +130,6 @@ const navItems: NavItem[] = [
     ],
   },
 
- 
-
   {
     label: "Settings",
     icon: Settings,
@@ -140,15 +137,14 @@ const navItems: NavItem[] = [
       { href: "/dashboard/settings/profile", label: "Admin Profile" },
       { href: "/dashboard/settings/app", label: "App Settings" },
       { href: "/dashboard/settings/payments", label: "Payment Settings" },
-      
     ],
   },
 
-  { href: "dashboard/notifications", label: "Notifications", icon: Bell },
+  { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
-export default function Sidebar() {
-  const pathname = usePathname();
+/* ✅ Sidebar component now typed */
+export default function Sidebar({ activePath }: SidebarProps) {
   const router = useRouter();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -157,12 +153,12 @@ export default function Sidebar() {
   useEffect(() => {
     const newOpenMenus: { [key: string]: boolean } = {};
     navItems.forEach((item) => {
-      if (item.submenu?.some((sub) => pathname.startsWith(sub.href))) {
+      if (item.submenu?.some((sub) => activePath.startsWith(sub.href))) {
         newOpenMenus[item.label] = true;
       }
     });
     setOpenMenus(newOpenMenus);
-  }, [pathname]);
+  }, [activePath]);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -186,50 +182,49 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-100 z-20 flex flex-col transform transition-transform lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-100 z-20 flex flex-col transform transition-transform lg:translate-x-0 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         {/* Logo */}
-       <div className="p-6 border-b border-gray-100">
-  <div className="flex items-center gap-3">
-    <div className="w-20 h-15 rounded-lg flex items-center justify-center overflow-hidden">
-      <img
-        src="/assets/logo.png"
-        alt="Logo"
-        className="w-18 h-18 object-contain"
-      />
-    </div>
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-20 h-15 rounded-lg flex items-center justify-center overflow-hidden">
+              <img
+                src="/assets/logo.png"
+                alt="Logo"
+                className="w-18 h-18 object-contain"
+              />
+            </div>
+            <span className="text-lg font-semibold text-gray-800">
+              Sri Mangalam
+            </span>
+          </div>
+        </div>
 
-    <span className="text-lg font-semibold text-gray-800">
-      Sri Mangalam
-    </span>
-  </div>
-</div>
-
-
-
+        {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto hide-scrollbar">
           {navItems.map((item) => {
             const isActive = item.href
-              ? pathname === item.href
-              : item.submenu?.some((sub) => pathname.startsWith(sub.href));
+              ? activePath === item.href
+              : item.submenu?.some((sub) => activePath.startsWith(sub.href));
             return (
               <div key={item.label}>
                 <div
-                  className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer font-medium text-sm transition-all ${isActive
+                  className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer font-medium text-sm transition-all ${
+                    isActive
                       ? "bg-red-50 text-red-600 font-semibold"
                       : "text-gray-600 hover:bg-gray-50 hover:text-red-600"
-                    }`}
+                  }`}
                   onClick={() => {
                     if (item.submenu) {
                       toggleMenu(item.label);
                     } else if (item.href) {
-                      router.push(item.href); // ✅ NAVIGATE
-                      setMobileOpen(false);    // ✅ close mobile sidebar
+                      router.push(item.href);
+                      setMobileOpen(false);
                     }
                   }}
                 >
-
                   <div className="flex items-center gap-3">
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span>{item.label}</span>
@@ -251,10 +246,11 @@ export default function Sidebar() {
                       <Link
                         key={sub.href}
                         href={sub.href}
-                        className={`px-3 py-2 text-sm rounded-lg transition-all ${pathname === sub.href
-                          ? "bg-red-100 text-red-600 font-semibold"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-red-600"
-                          }`}
+                        className={`px-3 py-2 text-sm rounded-lg transition-all ${
+                          activePath === sub.href
+                            ? "bg-red-100 text-red-600 font-semibold"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-red-600"
+                        }`}
                       >
                         {sub.label}
                       </Link>
@@ -265,7 +261,6 @@ export default function Sidebar() {
             );
           })}
         </nav>
-
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-100 mt-auto shrink-0">
@@ -278,7 +273,6 @@ export default function Sidebar() {
           </button>
         </div>
       </aside>
-
     </>
   );
 }

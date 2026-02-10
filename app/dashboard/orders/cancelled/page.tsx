@@ -6,7 +6,6 @@ import {
   Eye,
   FileDown,
   XCircle,
-  BarChart3,
   PieChart,
   AlertTriangle,
   IndianRupee,
@@ -15,7 +14,6 @@ import dynamic from "next/dynamic";
 import PaginatedTable from "../../components/PaginatedTable";
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
-
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
@@ -27,21 +25,33 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
-// ✅ Dynamic Map imports
+/* ✅ Dynamic imports with explicit typing */
 const MapContainer = dynamic(
-  () => import("react-leaflet").then((m) => m.MapContainer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.MapContainer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const TileLayer = dynamic(
-  () => import("react-leaflet").then((m) => m.TileLayer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.TileLayer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const Marker = dynamic(
-  () => import("react-leaflet").then((m) => m.Marker),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.Marker as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const Popup = dynamic(
-  () => import("react-leaflet").then((m) => m.Popup),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.Popup as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 
@@ -50,40 +60,33 @@ export default function CancelledOrdersPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [openMap, setOpenMap] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  // ✅ Cancelled Orders data
+  // ✅ Sample data
   const [orders] = useState([
     {
       id: "ORD10611",
       customer: "Riya Sharma",
       phone: "+91 9876543210",
       address: "A-23, Green Park, Delhi",
-      items: [
-        { name: "Butter Chicken", img: "/assets/products/butterchicken.jpg", qty: 1 },
-      ],
+      items: [{ name: "Butter Chicken", img: "/assets/products/butterchicken.jpg", qty: 1 }],
       payment: "Paid (UPI)",
       total: 349,
       orderDate: "01/23/2026",
       cancelDate: "01/23/2026",
-      status: "Cancelled",
       reason: "Customer unavailable",
-      location: { lat: 28.567, lng: 77.210 },
+      location: { lat: 28.567, lng: 77.21 },
     },
     {
       id: "ORD10612",
       customer: "Amit Verma",
       phone: "+91 9123456789",
       address: "Sector 5, Gurgaon",
-      items: [
-        { name: "Men’s Sneakers", img: "/assets/products/shoes.jpg", qty: 1 },
-      ],
+      items: [{ name: "Men’s Sneakers", img: "/assets/products/shoes.jpg", qty: 1 }],
       payment: "COD",
       total: 2599,
       orderDate: "01/22/2026",
       cancelDate: "01/22/2026",
-      status: "Cancelled",
       reason: "Payment not confirmed",
       location: { lat: 28.459, lng: 77.067 },
     },
@@ -92,14 +95,11 @@ export default function CancelledOrdersPage() {
       customer: "Sneha Singh",
       phone: "+91 9112233445",
       address: "MG Road, Bengaluru",
-      items: [
-        { name: "Gold Necklace", img: "/assets/products/necklace.jpg", qty: 1 },
-      ],
+      items: [{ name: "Gold Necklace", img: "/assets/products/necklace.jpg", qty: 1 }],
       payment: "Paid (Card)",
       total: 7999,
       orderDate: "01/21/2026",
       cancelDate: "01/21/2026",
-      status: "Cancelled",
       reason: "Seller rejected due to stock issue",
       location: { lat: 12.973, lng: 77.611 },
     },
@@ -116,8 +116,7 @@ export default function CancelledOrdersPage() {
     const orderDate = new Date(o.orderDate);
     const from = fromDate ? new Date(fromDate) : null;
     const to = toDate ? new Date(toDate) : null;
-    const matchesDate =
-      (!from || orderDate >= from) && (!to || orderDate <= to);
+    const matchesDate = (!from || orderDate >= from) && (!to || orderDate <= to);
     return matchesSearch && matchesDate;
   });
 
@@ -158,94 +157,35 @@ export default function CancelledOrdersPage() {
 
         {/* INSIGHTS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-xl shadow-sm border">
-            <div className="flex items-center gap-3 mb-2">
-              <XCircle className="w-5 h-5 text-red-600" />
-              <h3 className="font-semibold text-gray-700">Total Cancelled</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{totalCancelled}</p>
-            <p className="text-xs text-gray-500">All-time cancellations</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border">
-            <div className="flex items-center gap-3 mb-2">
-              <IndianRupee className="w-5 h-5 text-red-500" />
-              <h3 className="font-semibold text-gray-700">Revenue Lost</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">₹{totalLoss}</p>
-            <p className="text-xs text-gray-500">Total cancelled order value</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-500" />
-              <h3 className="font-semibold text-gray-700">Avg Order Loss</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">₹{avgLoss}</p>
-            <p className="text-xs text-gray-500">Per cancelled order</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border">
-            <div className="flex items-center gap-3 mb-2">
-              <PieChart className="w-5 h-5 text-purple-600" />
-              <h3 className="font-semibold text-gray-700">Top Reason</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">Customer Unavailable</p>
-            <p className="text-xs text-gray-500">Most common cancellation cause</p>
-          </div>
+          <InsightCard icon={<XCircle className="w-5 h-5 text-red-600" />} title="Total Cancelled" value={totalCancelled} subtitle="All-time cancellations" />
+          <InsightCard icon={<IndianRupee className="w-5 h-5 text-red-500" />} title="Revenue Lost" value={`₹${totalLoss}`} subtitle="Total cancelled order value" />
+          <InsightCard icon={<AlertTriangle className="w-5 h-5 text-yellow-500" />} title="Avg Order Loss" value={`₹${avgLoss}`} subtitle="Per cancelled order" />
+          <InsightCard icon={<PieChart className="w-5 h-5 text-purple-600" />} title="Top Reason" value="Customer Unavailable" subtitle="Most common cancellation cause" />
         </div>
 
-        {/* CHARTS (small height) */}
+        {/* CHARTS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-sm font-semibold text-gray-600 mb-3">
-              Cancellations by City
-            </h2>
-            <div className="h-[200px]">
-              <Bar
-                data={barData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-sm font-semibold text-gray-600 mb-3">
-              Cancellation Reasons
-            </h2>
-            <div className="h-[200px] flex items-center justify-center">
-              <Doughnut
-                data={doughnutData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { position: "bottom" } },
-                  cutout: "70%",
-                }}
-              />
-            </div>
-          </div>
+          <ChartCard title="Cancellations by City">
+            <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+          </ChartCard>
+          <ChartCard title="Cancellation Reasons">
+            <Doughnut
+              data={doughnutData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: "bottom" } },
+                cutout: "70%",
+              }}
+            />
+          </ChartCard>
         </div>
 
-        {/* FILTERS + TABLE */}
+        {/* TABLE */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
           <div className="flex flex-wrap items-center gap-3 mb-5">
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
-            />
-            <input
-              type="date"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
-            />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-gray-300 rounded-md px-3 py-1.5 text-sm" />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-gray-300 rounded-md px-3 py-1.5 text-sm" />
 
             <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-full sm:w-80 ml-auto">
               <Search className="w-4 h-4 text-gray-400 mr-2" />
@@ -263,7 +203,6 @@ export default function CancelledOrdersPage() {
             </button>
           </div>
 
-          {/* TABLE */}
           <table className="w-full text-sm border-collapse">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr className="text-gray-600 font-medium">
@@ -282,10 +221,7 @@ export default function CancelledOrdersPage() {
               data={filtered}
               defaultRows={5}
               renderRow={(o) => (
-                <tr
-                  key={o.id}
-                  className="border-b last:border-0 hover:bg-gray-50 transition"
-                >
+                <tr key={o.id} className="border-b last:border-0 hover:bg-gray-50 transition">
                   <td className="px-4 py-3 font-semibold text-gray-800">{o.id}</td>
                   <td className="px-4 py-3 text-gray-800">
                     {o.customer}
@@ -296,11 +232,7 @@ export default function CancelledOrdersPage() {
                   <td className="px-4 py-3 space-y-1">
                     {o.items.map((item, i) => (
                       <div key={i} className="flex items-center gap-2">
-                        <img
-                          src={item.img}
-                          alt={item.name}
-                          className="w-8 h-8 rounded-md border"
-                        />
+                        <img src={item.img} alt={item.name} className="w-8 h-8 rounded-md border" />
                         <span className="text-gray-700 text-sm">
                           {item.name} (x{item.qty})
                         </span>
@@ -333,15 +265,8 @@ export default function CancelledOrdersPage() {
         <div className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm">
           <div className="bg-white w-full sm:w-[460px] h-full shadow-xl p-6 flex flex-col animate-slideIn">
             <div className="flex items-center justify-between mb-4 border-b pb-3">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Cancelled Order Details
-              </h2>
-              <button
-                onClick={() => setOpenDrawer(false)}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                ✕
-              </button>
+              <h2 className="text-lg font-semibold text-gray-800">Cancelled Order Details</h2>
+              <button onClick={() => setOpenDrawer(false)} className="p-2 hover:bg-gray-100 rounded-full">✕</button>
             </div>
 
             <div className="space-y-2 text-sm text-gray-700 mb-4">
@@ -354,15 +279,16 @@ export default function CancelledOrdersPage() {
               <p><strong>Cancelled On:</strong> {selectedOrder.cancelDate}</p>
             </div>
 
+            {/* ✅ FIXED MAP TYPE */}
             <div className="flex-1 border rounded-lg overflow-hidden relative">
               <MapContainer
-                center={[selectedOrder.location.lat, selectedOrder.location.lng]}
+                center={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
                 zoom={14}
                 scrollWheelZoom={false}
                 className="h-[260px] w-full"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng]}>
+                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}>
                   <Popup>Customer: {selectedOrder.customer}</Popup>
                 </Marker>
               </MapContainer>
@@ -379,6 +305,29 @@ export default function CancelledOrdersPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ✅ Helper UI components */
+function InsightCard({ icon, title, value, subtitle }: any) {
+  return (
+    <div className="bg-white p-5 rounded-xl shadow-sm border">
+      <div className="flex items-center gap-3 mb-2">
+        {icon}
+        <h3 className="font-semibold text-gray-700">{title}</h3>
+      </div>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-500">{subtitle}</p>
+    </div>
+  );
+}
+
+function ChartCard({ title, children }: any) {
+  return (
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+      <h2 className="text-sm font-semibold text-gray-600 mb-3">{title}</h2>
+      <div className="h-[200px]">{children}</div>
     </div>
   );
 }

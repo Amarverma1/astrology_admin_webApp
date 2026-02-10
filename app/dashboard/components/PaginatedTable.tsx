@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 
 type PaginatedTableProps<T> = {
   data: T[];
@@ -9,7 +9,7 @@ type PaginatedTableProps<T> = {
   rowsPerPageOptions?: number[];
   onPageChange?: (page: number) => void;
   onRowsChange?: (rows: number) => void;
-  renderRow: (item: T) => JSX.Element;
+  renderRow: (item: T) => React.ReactElement; // ✅ fixed JSX.Element -> React.ReactElement
 };
 
 export default function PaginatedTable<T>({
@@ -71,7 +71,7 @@ export default function PaginatedTable<T>({
       {/* Rows */}
       {paginatedData.map(renderRow)}
 
-      {/* Pagination bar inside table (right-aligned) */}
+      {/* Pagination Bar */}
       {total > rowsPerPage && (
         <tr>
           <td colSpan={999} className="p-2">
@@ -97,7 +97,7 @@ export default function PaginatedTable<T>({
                 {startIdx + 1}-{Math.min(startIdx + rowsPerPage, total)} of {total}
               </span>
 
-              {/* Buttons */}
+              {/* Pagination buttons */}
               <div className="flex gap-1">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -106,6 +106,7 @@ export default function PaginatedTable<T>({
                 >
                   ‹
                 </button>
+
                 {visiblePages.map((num, i) =>
                   num === "…" ? (
                     <span key={i} className="px-2 text-gray-500">
@@ -125,6 +126,7 @@ export default function PaginatedTable<T>({
                     </button>
                   )
                 )}
+
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}

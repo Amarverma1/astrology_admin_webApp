@@ -6,12 +6,9 @@ import {
   Eye,
   FileDown,
   RotateCcw,
-  BarChart3,
   PieChart,
   AlertTriangle,
   IndianRupee,
-  Bike,
-  CreditCard,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import PaginatedTable from "../../components/PaginatedTable";
@@ -26,23 +23,36 @@ import {
   Legend,
 } from "chart.js";
 
+// ✅ Chart setup
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
-// ✅ Dynamic Map imports
+// ✅ Dynamic Map imports with proper typing
 const MapContainer = dynamic(
-  () => import("react-leaflet").then((m) => m.MapContainer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.MapContainer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const TileLayer = dynamic(
-  () => import("react-leaflet").then((m) => m.TileLayer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.TileLayer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const Marker = dynamic(
-  () => import("react-leaflet").then((m) => m.Marker),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.Marker as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const Popup = dynamic(
-  () => import("react-leaflet").then((m) => m.Popup),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.Popup as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 
@@ -53,16 +63,14 @@ export default function ReturnedOrdersPage() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  // ✅ Sample Returned Orders data with Refund + Rider
+  // ✅ Sample Returned Orders data
   const [orders] = useState([
     {
       id: "RET20101",
       customer: "Riya Sharma",
       phone: "+91 9876543210",
       address: "A-23, Green Park, Delhi",
-      items: [
-        { name: "Red Dress", img: "/assets/products/dress.jpg", qty: 1 },
-      ],
+      items: [{ name: "Red Dress", img: "/assets/products/dress.jpg", qty: 1 }],
       payment: "Paid (UPI)",
       total: 1299,
       orderDate: "01/20/2026",
@@ -71,7 +79,7 @@ export default function ReturnedOrdersPage() {
       reason: "Size not fitting",
       condition: "Good",
       refundStatus: "Processed",
-      location: { lat: 28.567, lng: 77.210 },
+      location: { lat: 28.567, lng: 77.21 },
       rider: { name: "Rohit Yadav", phone: "+91 9870001111", lat: 28.568, lng: 77.214 },
     },
     {
@@ -79,9 +87,7 @@ export default function ReturnedOrdersPage() {
       customer: "Amit Verma",
       phone: "+91 9123456789",
       address: "Sector 5, Gurgaon",
-      items: [
-        { name: "Wireless Headphones", img: "/assets/products/headphones.jpg", qty: 1 },
-      ],
+      items: [{ name: "Wireless Headphones", img: "/assets/products/headphones.jpg", qty: 1 }],
       payment: "Paid (Card)",
       total: 2599,
       orderDate: "01/18/2026",
@@ -91,16 +97,14 @@ export default function ReturnedOrdersPage() {
       condition: "Defective",
       refundStatus: "Pending",
       location: { lat: 28.459, lng: 77.067 },
-      rider: { name: "Deepak Singh", phone: "+91 9823456789", lat: 28.460, lng: 77.065 },
+      rider: { name: "Deepak Singh", phone: "+91 9823456789", lat: 28.46, lng: 77.065 },
     },
     {
       id: "RET20103",
       customer: "Sneha Singh",
       phone: "+91 9112233445",
       address: "MG Road, Bengaluru",
-      items: [
-        { name: "Gold Earrings", img: "/assets/products/earrings.jpg", qty: 1 },
-      ],
+      items: [{ name: "Gold Earrings", img: "/assets/products/earrings.jpg", qty: 1 }],
       payment: "Paid (Card)",
       total: 5999,
       orderDate: "01/16/2026",
@@ -147,11 +151,7 @@ export default function ReturnedOrdersPage() {
   const barData = {
     labels: ["Delhi", "Gurgaon", "Bengaluru"],
     datasets: [
-      {
-        label: "Returned Orders",
-        data: [5, 3, 2],
-        backgroundColor: "#F59E0B",
-      },
+      { label: "Returned Orders", data: [5, 3, 2], backgroundColor: "#F59E0B" },
     ],
   };
 
@@ -170,9 +170,7 @@ export default function ReturnedOrdersPage() {
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            Returned Orders
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Returned Orders</h1>
           <p className="text-sm text-gray-500">
             Track and analyze all returned orders, riders, and refund progress.
           </p>
@@ -180,75 +178,82 @@ export default function ReturnedOrdersPage() {
 
         {/* INSIGHTS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-xl shadow-sm border  hover:shadow-md transition">
-            <div className="flex items-center gap-3 mb-2">
-              <RotateCcw className="w-5 h-5 text-amber-600" />
-              <h3 className="font-semibold text-gray-700">Total Returns</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{totalReturns}</p>
-            <p className="text-xs text-gray-500">Total returned orders</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border  hover:shadow-md transition">
-            <div className="flex items-center gap-3 mb-2">
-              <IndianRupee className="w-5 h-5 text-green-600" />
-              <h3 className="font-semibold text-gray-700">Total Value</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">₹{totalValue}</p>
-            <p className="text-xs text-gray-500">Total returned order worth</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border  hover:shadow-md transition">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-500" />
-              <h3 className="font-semibold text-gray-700">Avg Order Value</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">₹{avgValue}</p>
-            <p className="text-xs text-gray-500">Per returned order</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border  hover:shadow-md transition">
-            <div className="flex items-center gap-3 mb-2">
-              <PieChart className="w-5 h-5 text-purple-600" />
-              <h3 className="font-semibold text-gray-700">Top Reason</h3>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">Size Issue</p>
-            <p className="text-xs text-gray-500">Most common return cause</p>
-          </div>
+          <InsightCard
+            icon={<RotateCcw className="w-5 h-5 text-amber-600" />}
+            title="Total Returns"
+            value={totalReturns}
+            subtitle="Total returned orders"
+          />
+          <InsightCard
+            icon={<IndianRupee className="w-5 h-5 text-green-600" />}
+            title="Total Value"
+            value={`₹${totalValue}`}
+            subtitle="Total returned order worth"
+          />
+          <InsightCard
+            icon={<AlertTriangle className="w-5 h-5 text-yellow-500" />}
+            title="Avg Order Value"
+            value={`₹${avgValue}`}
+            subtitle="Per returned order"
+          />
+          <InsightCard
+            icon={<PieChart className="w-5 h-5 text-purple-600" />}
+            title="Top Reason"
+            value="Size Issue"
+            subtitle="Most common return cause"
+          />
         </div>
 
-        {/* CHARTS (Compact) */}
+        {/* CHARTS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100  hover:shadow-md transition">
-            <h2 className="text-sm font-semibold text-gray-600 mb-3">
-              Returns by City
-            </h2>
-            <div className="h-[200px]">
-              <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
-            </div>
-          </div>
-
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100  hover:shadow-md transition">
-            <h2 className="text-sm font-semibold text-gray-600 mb-3">
-              Return Reasons
-            </h2>
-            <div className="h-[200px] flex items-center justify-center">
-              <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, cutout: "70%" }} />
-            </div>
-          </div>
+          <ChartCard title="Returns by City">
+            <Bar
+              data={barData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+              }}
+            />
+          </ChartCard>
+          <ChartCard title="Return Reasons">
+            <Doughnut
+              data={doughnutData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: "bottom" } },
+                cutout: "70%",
+              }}
+            />
+          </ChartCard>
         </div>
 
         {/* FILTERS + TABLE */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
           <div className="flex flex-wrap items-center gap-3 mb-5">
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-gray-300 rounded-md px-3 py-1.5 text-sm" />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-gray-300 rounded-md px-3 py-1.5 text-sm" />
-
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
+            />
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-1.5 text-sm"
+            />
             <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-full sm:w-80 ml-auto">
               <Search className="w-4 h-4 text-gray-400 mr-2" />
-              <input type="text" placeholder="Search by name or order id..." value={search} onChange={(e) => setSearch(e.target.value)} className="bg-transparent outline-none text-sm flex-1" />
+              <input
+                type="text"
+                placeholder="Search by name or order id..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-transparent outline-none text-sm flex-1"
+              />
             </div>
-
             <button className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-800">
               <FileDown className="w-4 h-4" /> Export
             </button>
@@ -269,12 +274,14 @@ export default function ReturnedOrdersPage() {
                 <th className="px-4 py-3 text-center">Action</th>
               </tr>
             </thead>
-
             <PaginatedTable
               data={filtered}
               defaultRows={5}
               renderRow={(o) => (
-                <tr key={o.id} className="border-b last:border-0 hover:bg-gray-50 transition">
+                <tr
+                  key={o.id}
+                  className="border-b last:border-0 hover:bg-gray-50 transition"
+                >
                   <td className="px-4 py-3 font-semibold text-gray-800">{o.id}</td>
                   <td className="px-4 py-3 text-gray-800">
                     {o.customer}
@@ -301,7 +308,13 @@ export default function ReturnedOrdersPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{o.returnDate}</td>
                   <td className="px-4 py-3 text-center">
-                    <button onClick={() => { setSelectedOrder(o); setOpenDrawer(true); }} className="p-1.5 bg-gray-100 rounded-full hover:bg-gray-200">
+                    <button
+                      onClick={() => {
+                        setSelectedOrder(o);
+                        setOpenDrawer(true);
+                      }}
+                      className="p-1.5 bg-gray-100 rounded-full hover:bg-gray-200"
+                    >
                       <Eye className="w-4 h-4 text-amber-600" />
                     </button>
                   </td>
@@ -318,7 +331,9 @@ export default function ReturnedOrdersPage() {
           <div className="bg-white w-full sm:w-[460px] h-full shadow-xl p-6 flex flex-col animate-slideIn">
             <div className="flex items-center justify-between mb-4 border-b pb-3">
               <h2 className="text-lg font-semibold text-gray-800">Returned Order Details</h2>
-              <button onClick={() => setOpenDrawer(false)} className="p-2 hover:bg-gray-100 rounded-full">✕</button>
+              <button onClick={() => setOpenDrawer(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                ✕
+              </button>
             </div>
 
             <div className="space-y-2 text-sm text-gray-700 mb-4">
@@ -337,29 +352,59 @@ export default function ReturnedOrdersPage() {
             {/* MAP */}
             <div className="flex-1 border rounded-lg overflow-hidden relative">
               <MapContainer
-                center={[selectedOrder.location.lat, selectedOrder.location.lng]}
+                center={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
                 zoom={14}
                 scrollWheelZoom={false}
                 className="h-[260px] w-full"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {/* Customer marker */}
-                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng]}>
+                <Marker
+                  position={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
+                >
                   <Popup>Customer: {selectedOrder.customer}</Popup>
                 </Marker>
-                {/* Rider marker */}
-                <Marker position={[selectedOrder.rider.lat, selectedOrder.rider.lng]}>
+                <Marker
+                  position={[selectedOrder.rider.lat, selectedOrder.rider.lng] as [number, number]}
+                >
                   <Popup>Rider: {selectedOrder.rider.name}</Popup>
                 </Marker>
               </MapContainer>
             </div>
 
             <div className="mt-4 border-t pt-3 flex justify-end">
-              <button onClick={() => setOpenDrawer(false)} className="bg-amber-600 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-amber-700">Close</button>
+              <button
+                onClick={() => setOpenDrawer(false)}
+                className="bg-amber-600 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-amber-700"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ✅ Small helper components */
+function InsightCard({ icon, title, value, subtitle }: any) {
+  return (
+    <div className="bg-white p-5 rounded-xl shadow-sm border hover:shadow-md transition">
+      <div className="flex items-center gap-3 mb-2">
+        {icon}
+        <h3 className="font-semibold text-gray-700">{title}</h3>
+      </div>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-500">{subtitle}</p>
+    </div>
+  );
+}
+
+function ChartCard({ title, children }: any) {
+  return (
+    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
+      <h2 className="text-sm font-semibold text-gray-600 mb-3">{title}</h2>
+      <div className="h-[200px]">{children}</div>
     </div>
   );
 }

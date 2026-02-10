@@ -1,25 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Eye, FileDown, User } from "lucide-react";
+import { Search, Eye, FileDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import PaginatedTable from "../components/PaginatedTable";
 
-// ✅ Dynamic map imports
+// ✅ Dynamic Map imports with typing fixes
 const MapContainer = dynamic(
-  () => import("react-leaflet").then((m) => m.MapContainer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.MapContainer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const TileLayer = dynamic(
-  () => import("react-leaflet").then((m) => m.TileLayer),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.TileLayer as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const Marker = dynamic(
-  () => import("react-leaflet").then((m) => m.Marker),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.Marker as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 const Popup = dynamic(
-  () => import("react-leaflet").then((m) => m.Popup),
+  () =>
+    import("react-leaflet").then(
+      (m) => m.Popup as React.ComponentType<any>
+    ),
   { ssr: false }
 );
 
@@ -32,7 +44,7 @@ export default function AllOrdersPage() {
   const [openMap, setOpenMap] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  // ✅ Sample orders with rider details
+  // ✅ Sample data
   const [orders, setOrders] = useState([
     {
       id: "ORD10231",
@@ -48,7 +60,7 @@ export default function AllOrdersPage() {
       orderDate: "01/25/2026",
       deliveryDate: "01/25/2026",
       status: "Out for Delivery",
-      location: { lat: 28.567, lng: 77.210 },
+      location: { lat: 28.567, lng: 77.21 },
       rider: {
         name: "Rohit Yadav",
         phone: "+91 9870001111",
@@ -72,7 +84,7 @@ export default function AllOrdersPage() {
       rider: {
         name: "Deepak Singh",
         phone: "+91 9823456789",
-        location: { lat: 28.460, lng: 77.065 },
+        location: { lat: 28.46, lng: 77.065 },
       },
     },
     {
@@ -291,64 +303,40 @@ export default function AllOrdersPage() {
               <p><strong>Order ID:</strong> {selectedOrder.id}</p>
               <p><strong>Customer:</strong> {selectedOrder.customer} ({selectedOrder.phone})</p>
               <p><strong>Address:</strong> {selectedOrder.address}</p>
-
               <p><strong>Rider:</strong> {selectedOrder.rider.name} ({selectedOrder.rider.phone})</p>
-
-              <p><strong>Items:</strong></p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {selectedOrder.items.map((item: any, i: number) => (
-                  <div
-                    key={i}
-                    className="flex flex-col items-center p-2 border rounded-md w-[80px]"
-                  >
-                    <img
-                      src={item.img}
-                      alt={item.name}
-                      className="w-12 h-12 object-cover rounded-md"
-                    />
-                    <p className="text-xs text-center mt-1">{item.name}</p>
-                    <span className="text-[10px] text-gray-500">
-                      Qty: {item.qty}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
               <p><strong>Payment:</strong> {selectedOrder.payment}</p>
-
-              <p className="flex items-center gap-2">
-                <strong>Status:</strong>
-                <select
-                  value={selectedOrder.status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm"
-                >
-                  <option>Pending</option>
-                  <option>Preparing</option>
-                  <option>Out for Delivery</option>
-                  <option>Delivered</option>
-                  <option>Cancelled</option>
-                </select>
-              </p>
-
-              <p><strong>Total:</strong> <span className="font-semibold text-gray-900">₹{selectedOrder.total}</span></p>
+              <p><strong>Status:</strong></p>
+              <select
+                value={selectedOrder.status}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+              >
+                <option>Pending</option>
+                <option>Preparing</option>
+                <option>Out for Delivery</option>
+                <option>Delivered</option>
+                <option>Cancelled</option>
+              </select>
+              <p><strong>Total:</strong> ₹{selectedOrder.total}</p>
             </div>
 
             {/* Map Section */}
             <div className="flex-1 border rounded-lg overflow-hidden relative">
               <MapContainer
-                center={[selectedOrder.location.lat, selectedOrder.location.lng]}
+                center={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
                 zoom={14}
                 scrollWheelZoom={false}
                 className="h-[260px] w-full"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {/* Customer marker */}
-                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng]}>
+                <Marker
+                  position={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
+                >
                   <Popup>Customer: {selectedOrder.customer}</Popup>
                 </Marker>
-                {/* Rider marker */}
-                <Marker position={[selectedOrder.rider.location.lat, selectedOrder.rider.location.lng]}>
+                <Marker
+                  position={[selectedOrder.rider.location.lat, selectedOrder.rider.location.lng] as [number, number]}
+                >
                   <Popup>Rider: {selectedOrder.rider.name}</Popup>
                 </Marker>
               </MapContainer>
@@ -388,18 +376,20 @@ export default function AllOrdersPage() {
             </h3>
             <div className="h-[350px] border rounded-lg overflow-hidden">
               <MapContainer
-                center={[selectedOrder.location.lat, selectedOrder.location.lng]}
+                center={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
                 zoom={14}
                 scrollWheelZoom={false}
                 className="h-full w-full"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {/* Customer marker */}
-                <Marker position={[selectedOrder.location.lat, selectedOrder.location.lng]}>
+                <Marker
+                  position={[selectedOrder.location.lat, selectedOrder.location.lng] as [number, number]}
+                >
                   <Popup>Customer: {selectedOrder.customer}</Popup>
                 </Marker>
-                {/* Rider marker */}
-                <Marker position={[selectedOrder.rider.location.lat, selectedOrder.rider.location.lng]}>
+                <Marker
+                  position={[selectedOrder.rider.location.lat, selectedOrder.rider.location.lng] as [number, number]}
+                >
                   <Popup>Rider: {selectedOrder.rider.name}</Popup>
                 </Marker>
               </MapContainer>
