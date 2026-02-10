@@ -17,22 +17,22 @@ export default function CategoriesPage() {
   const [searchAll, setSearchAll] = useState("");
   const [searchUsed, setSearchUsed] = useState("");
 
-  // Dummy categories data
-  const allCategories = [
+  // ✅ Make categories stateful so toggle works
+  const [categories, setCategories] = useState([
     { id: 1, name: "Dishes", img: "/assets/categories/food.jpg", parent: "-", type: "Head", active: true },
     { id: 2, name: "Beauty Products", img: "/assets/categories/beauty.jpg", parent: "-", type: "Head", active: true },
     { id: 3, name: "Face Cream", img: "/assets/categories/cream.jpg", parent: "Beauty Products", type: "Sub", active: true },
     { id: 4, name: "Shoes", img: "/assets/categories/shoes.jpg", parent: "-", type: "Head", active: false },
     { id: 5, name: "Men Shoes", img: "/assets/categories/men-shoes.jpg", parent: "Shoes", type: "Sub", active: true },
-  ];
+  ]);
 
-  const usedCategories = [
+  const [usedCategories, setUsedCategories] = useState([
     { id: 6, name: "Jewelry", img: "/assets/categories/jewelry.jpg", parent: "-", type: "Head", active: true },
     { id: 7, name: "Gold Necklace", img: "/assets/categories/necklace.jpg", parent: "Jewelry", type: "Sub", active: true },
     { id: 8, name: "Street Food", img: "/assets/categories/street.jpg", parent: "Dishes", type: "Sub", active: true },
-  ];
+  ]);
 
-  const filteredAll = allCategories.filter((cat) =>
+  const filteredAll = categories.filter((cat) =>
     cat.name.toLowerCase().includes(searchAll.toLowerCase())
   );
 
@@ -211,7 +211,7 @@ export default function CategoriesPage() {
                         <input
                           type="checkbox"
                           checked={item.active}
-                          onChange={() => toggleActive(item.id, setCategories)}
+                          onChange={() => toggleActive(item.id, setUsedCategories)}
                           className="sr-only peer"
                         />
                         <div className="relative w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-red-600 transition-all">
