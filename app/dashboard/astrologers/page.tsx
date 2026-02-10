@@ -12,9 +12,8 @@ import {
   Loader2,
 } from "lucide-react";
 import apiClient from "@/lib/apiClient";
-import { confirmAlert } from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css'; // prebuilt styles
-
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css"; // prebuilt styles
 
 /* -------------------- TYPES -------------------- */
 type Astrologer = {
@@ -44,16 +43,24 @@ type Astrologer = {
 };
 
 /* -------------------- TOGGLE -------------------- */
-function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: () => void;
+}) {
   return (
     <button
       onClick={onChange}
-      className={`w-10 h-5 flex items-center rounded-full px-1 transition ${checked ? "bg-green-500" : "bg-gray-300"
-        }`}
+      className={`w-10 h-5 flex items-center rounded-full px-1 transition ${
+        checked ? "bg-green-500" : "bg-gray-300"
+      }`}
     >
       <span
-        className={`w-4 h-4 bg-white rounded-full shadow transform transition ${checked ? "translate-x-5" : ""
-          }`}
+        className={`w-4 h-4 bg-white rounded-full shadow transform transition ${
+          checked ? "translate-x-5" : ""
+        }`}
       />
     </button>
   );
@@ -75,10 +82,9 @@ export default function AllAstrologersPage() {
   const [minExp, setMinExp] = useState("");
   const [maxExp, setMaxExp] = useState("");
 
-  // At the top of your component
+  // delete modal
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Astrologer | null>(null);
-
 
   // pagination
   const [page, setPage] = useState(1);
@@ -96,10 +102,14 @@ export default function AllAstrologersPage() {
       const params = new URLSearchParams();
 
       if (search) params.append("search", search);
-      if (isActive !== "All") params.append("is_active", String(isActive === "Active"));
-      if (isBlocked !== "All") params.append("is_blocked", String(isBlocked === "Blocked"));
-      if (isVerified !== "All") params.append("is_verified", String(isVerified === "Verified"));
-      if (isOnline !== "All") params.append("is_online", String(isOnline === "Online"));
+      if (isActive !== "All")
+        params.append("is_active", String(isActive === "Active"));
+      if (isBlocked !== "All")
+        params.append("is_blocked", String(isBlocked === "Blocked"));
+      if (isVerified !== "All")
+        params.append("is_verified", String(isVerified === "Verified"));
+      if (isOnline !== "All")
+        params.append("is_online", String(isOnline === "Online"));
       if (minRating) params.append("min_rating", minRating);
       if (maxRating) params.append("max_rating", maxRating);
       if (minExp) params.append("min_experience", minExp);
@@ -122,11 +132,10 @@ export default function AllAstrologersPage() {
 
   const handleDelete = async () => {
     if (!toDelete) return;
-
     try {
       const res = await apiClient.delete(`/admin/users/${toDelete.user_id}`);
       if (res.data?.success) {
-        fetchAstrologers(); // refresh table
+        fetchAstrologers();
         setDeleteModalOpen(false);
         setToDelete(null);
       }
@@ -134,7 +143,6 @@ export default function AllAstrologersPage() {
       console.error("Delete failed:", err);
     }
   };
-
 
   useEffect(() => {
     fetchAstrologers();
@@ -178,30 +186,51 @@ export default function AllAstrologersPage() {
           </div>
 
           {/* Filters */}
-          {["isActive", "isBlocked", "isVerified", "isOnline"].map((filter) => {
-            const stateMap: Record<string, any> = {
-              isActive: { state: isActive, setter: setIsActive, options: ["All", "Active", "Inactive"] },
-              isBlocked: { state: isBlocked, setter: setIsBlocked, options: ["All", "Blocked", "Unblocked"] },
-              isVerified: { state: isVerified, setter: setIsVerified, options: ["All", "Verified", "Unverified"] },
-              isOnline: { state: isOnline, setter: setIsOnline, options: ["All", "Online", "Offline"] },
-            };
-            const f = stateMap[filter];
-            return (
-              <select
-                key={filter}
-                value={f.state}
-                onChange={(e) => {
-                  setPage(1);
-                  f.setter(e.target.value);
-                }}
-                className="input-filter"
-              >
-                {f.options.map((opt) => (
-                  <option key={opt}>{opt}</option>
-                ))}
-              </select>
-            );
-          })}
+          {(["isActive", "isBlocked", "isVerified", "isOnline"] as const).map(
+            (filter) => {
+              const stateMap: Record<
+                typeof filter,
+                { state: string; setter: (val: string) => void; options: string[] }
+              > = {
+                isActive: {
+                  state: isActive,
+                  setter: setIsActive,
+                  options: ["All", "Active", "Inactive"],
+                },
+                isBlocked: {
+                  state: isBlocked,
+                  setter: setIsBlocked,
+                  options: ["All", "Blocked", "Unblocked"],
+                },
+                isVerified: {
+                  state: isVerified,
+                  setter: setIsVerified,
+                  options: ["All", "Verified", "Unverified"],
+                },
+                isOnline: {
+                  state: isOnline,
+                  setter: setIsOnline,
+                  options: ["All", "Online", "Offline"],
+                },
+              };
+              const f = stateMap[filter];
+              return (
+                <select
+                  key={filter}
+                  value={f.state}
+                  onChange={(e) => {
+                    setPage(1);
+                    f.setter(e.target.value);
+                  }}
+                  className="input-filter"
+                >
+                  {f.options.map((opt: string) => (
+                    <option key={opt}>{opt}</option>
+                  ))}
+                </select>
+              );
+            }
+          )}
 
           {/* Range Filters */}
           {[
@@ -255,16 +284,26 @@ export default function AllAstrologersPage() {
               <tbody>
                 {data.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-6 text-gray-500">
+                    <td
+                      colSpan={8}
+                      className="text-center py-6 text-gray-500"
+                    >
                       No astrologers found
                     </td>
                   </tr>
                 ) : (
                   data.map((a) => (
-                    <tr key={a.user_id} className="hover:bg-gray-50 transition">
+                    <tr
+                      key={a.user_id}
+                      className="hover:bg-gray-50 transition"
+                    >
                       <td className="px-3 py-3">
                         <img
-                          src={a.profile_photo ? `/uploads/${a.profile_photo}` : "/default-user.png"}
+                          src={
+                            a.profile_photo
+                              ? `/uploads/${a.profile_photo}`
+                              : "/default-user.png"
+                          }
                           className="w-10 h-10 rounded-full object-cover"
                           alt={a.name}
                         />
@@ -273,16 +312,22 @@ export default function AllAstrologersPage() {
                         <div>
                           <p className="font-medium flex items-center">
                             {a.name}
-                            {a.is_verified && <CheckCircle className="text-blue-500 w-4 h-4" />}
+                            {a.is_verified && (
+                              <CheckCircle className="text-blue-500 w-4 h-4 ml-1" />
+                            )}
                           </p>
-                          <p className="text-xs text-gray-500">{a.specializations}</p>
+                          <p className="text-xs text-gray-500">
+                            {a.specializations}
+                          </p>
                         </div>
                       </td>
                       <td>
                         <p>{a.mobile}</p>
                         <p className="text-xs text-gray-500">{a.email}</p>
                       </td>
-                      <td>⭐ {a.rating || "0.0"} ({a.total_reviews || 0})</td>
+                      <td>
+                        ⭐ {a.rating || "0.0"} ({a.total_reviews || 0})
+                      </td>
                       <td className="text-center">
                         {a.is_online ? (
                           <span className="flex items-center justify-center text-green-600 text-xs gap-1">
@@ -294,11 +339,17 @@ export default function AllAstrologersPage() {
                           </span>
                         )}
                       </td>
-                      <td className="text-center ">
-                        <Toggle checked={a.is_active} onChange={() => toggleActive(a.user_id)} />
+                      <td className="text-center">
+                        <Toggle
+                          checked={a.is_active}
+                          onChange={() => toggleActive(a.user_id)}
+                        />
                       </td>
                       <td className="text-center">
-                        <Toggle checked={a.is_blocked} onChange={() => toggleBlocked(a.user_id)} />
+                        <Toggle
+                          checked={a.is_blocked}
+                          onChange={() => toggleBlocked(a.user_id)}
+                        />
                       </td>
                       <td className="text-center">
                         <button
@@ -317,36 +368,33 @@ export default function AllAstrologersPage() {
                           className="p-1.5 hover:bg-gray-100 rounded text-red-600"
                           onClick={() => {
                             confirmAlert({
-                              title: 'Delete Astrologer',
-                              message: `Are you sure you want to delete ${a.name}? This action cannot be undone.`,
+                              title: "Delete Astrologer",
+                              message: `Are you sure you want to delete ${a.name}?`,
                               buttons: [
                                 {
-                                  label: 'Cancel',
-                                  onClick: () => { } // do nothing
+                                  label: "Cancel",
+                                  onClick: () => {},
                                 },
                                 {
-                                  label: 'Delete',
+                                  label: "Delete",
                                   onClick: async () => {
                                     try {
-                                      const res = await apiClient.delete(`/admin/${a.user_id}`);
-                                      if (res.data?.success) {
-                                        fetchAstrologers(); // refresh table
-                                      }
+                                      const res = await apiClient.delete(
+                                        `/admin/${a.user_id}`
+                                      );
+                                      if (res.data?.success)
+                                        fetchAstrologers();
                                     } catch (err) {
                                       console.error("Delete failed:", err);
                                     }
-                                  }
-                                }
+                                  },
+                                },
                               ],
-                              closeOnEscape: true,
-                              closeOnClickOutside: true,
                             });
                           }}
                         >
                           <Trash2 size={16} />
                         </button>
-
-
                       </td>
                     </tr>
                   ))
@@ -380,29 +428,43 @@ export default function AllAstrologersPage() {
         )}
       </div>
 
-      {/* Drawer */}
-      {drawerOpen && selected && <Drawer selected={selected} close={() => setDrawerOpen(false)} />}
+      {drawerOpen && selected && (
+        <Drawer selected={selected} close={() => setDrawerOpen(false)} />
+      )}
     </div>
   );
 }
 
-
-
 /* -------------------- DRAWER -------------------- */
-function Drawer({ selected, close }: { selected: Astrologer; close: () => void }) {
+function Drawer({
+  selected,
+  close,
+}: {
+  selected: Astrologer;
+  close: () => void;
+}) {
   return (
     <div className="fixed inset-0 bg-black/30 flex justify-end z-50">
       <div className="flex-1" onClick={close} />
       <div className="bg-white w-[480px] h-full p-6 shadow-2xl overflow-y-auto border-l border-gray-100">
         <div className="flex justify-between items-center mb-5">
-          <h2 className="font-semibold text-lg text-gray-800">Astrologer Details</h2>
-          <X className="cursor-pointer text-gray-500 hover:text-gray-700" onClick={close} />
+          <h2 className="font-semibold text-lg text-gray-800">
+            Astrologer Details
+          </h2>
+          <X
+            className="cursor-pointer text-gray-500 hover:text-gray-700"
+            onClick={close}
+          />
         </div>
 
         {/* Profile Section */}
         <div className="text-center border-b border-gray-100 pb-5">
           <img
-            src={selected.profile_photo ? `/uploads/${selected.profile_photo}` : "/default-user.png"}
+            src={
+              selected.profile_photo
+                ? `/uploads/${selected.profile_photo}`
+                : "/default-user.png"
+            }
             className="w-28 h-28 rounded-full mx-auto mb-3 object-cover border border-gray-200 shadow-sm"
             alt={selected.name}
           />
@@ -433,25 +495,60 @@ function Drawer({ selected, close }: { selected: Astrologer; close: () => void }
           </p>
         </div>
 
-        {/* Details */}
         <div className="mt-6 text-sm text-gray-700 space-y-5">
           <Section title="Contact Info">
             <div className="grid grid-cols-2 gap-y-2">
-              <p><b>Email:</b><br />{selected.email || "—"}</p>
-              <p><b>Mobile:</b><br />{selected.mobile || "—"}</p>
-              <p><b>User ID:</b><br />{selected.user_id}</p>
-              <p><b>Profile ID:</b><br />{selected.astrologer_profile_id}</p>
+              <p>
+                <b>Email:</b>
+                <br />
+                {selected.email || "—"}
+              </p>
+              <p>
+                <b>Mobile:</b>
+                <br />
+                {selected.mobile || "—"}
+              </p>
+              <p>
+                <b>User ID:</b>
+                <br />
+                {selected.user_id}
+              </p>
+              <p>
+                <b>Profile ID:</b>
+                <br />
+                {selected.astrologer_profile_id}
+              </p>
             </div>
           </Section>
 
           <Section title="Profile Info">
             <div className="grid grid-cols-2 gap-y-2">
-              <p><b>Experience:</b><br />{selected.experience_years || 0} yrs</p>
-              <p><b>Education:</b><br />{selected.education || "—"}</p>
-              <p><b>Languages:</b><br />{selected.languages || "—"}</p>
-              <p><b>Verified:</b><br />{selected.is_verified ? "Yes" : "No"}</p>
+              <p>
+                <b>Experience:</b>
+                <br />
+                {selected.experience_years || 0} yrs
+              </p>
+              <p>
+                <b>Education:</b>
+                <br />
+                {selected.education || "—"}
+              </p>
+              <p>
+                <b>Languages:</b>
+                <br />
+                {selected.languages || "—"}
+              </p>
+              <p>
+                <b>Verified:</b>
+                <br />
+                {selected.is_verified ? "Yes" : "No"}
+              </p>
             </div>
-            <p className="mt-2"><b>Bio:</b><br />{selected.bio || "—"}</p>
+            <p className="mt-2">
+              <b>Bio:</b>
+              <br />
+              {selected.bio || "—"}
+            </p>
           </Section>
 
           <Section title="Specializations">
@@ -462,24 +559,42 @@ function Drawer({ selected, close }: { selected: Astrologer; close: () => void }
             <div className="grid grid-cols-3 text-center border border-gray-100 rounded-lg overflow-hidden">
               <div className="py-2 bg-gray-50">
                 <p className="text-xs text-gray-500">Chat</p>
-                <p className="font-semibold text-gray-800">₹{selected.chat_price_per_min || "—"}</p>
+                <p className="font-semibold text-gray-800">
+                  ₹{selected.chat_price_per_min || "—"}
+                </p>
               </div>
               <div className="py-2 border-x border-gray-100">
                 <p className="text-xs text-gray-500">Call</p>
-                <p className="font-semibold text-gray-800">₹{selected.call_price_per_min || "—"}</p>
+                <p className="font-semibold text-gray-800">
+                  ₹{selected.call_price_per_min || "—"}
+                </p>
               </div>
               <div className="py-2 bg-gray-50">
                 <p className="text-xs text-gray-500">Video</p>
-                <p className="font-semibold text-gray-800">₹{selected.video_price_per_min || "—"}</p>
+                <p className="font-semibold text-gray-800">
+                  ₹{selected.video_price_per_min || "—"}
+                </p>
               </div>
             </div>
           </Section>
 
           <Section title="Account Details">
             <div className="grid grid-cols-2 gap-y-2">
-              <p><b>Currency:</b><br />{selected.currency || "INR"}</p>
-              <p><b>Joined:</b><br />{new Date(selected.created_at).toLocaleDateString()}</p>
-              <p><b>Last Updated:</b><br />{new Date(selected.updated_at).toLocaleDateString()}</p>
+              <p>
+                <b>Currency:</b>
+                <br />
+                {selected.currency || "INR"}
+              </p>
+              <p>
+                <b>Joined:</b>
+                <br />
+                {new Date(selected.created_at).toLocaleDateString()}
+              </p>
+              <p>
+                <b>Last Updated:</b>
+                <br />
+                {new Date(selected.updated_at).toLocaleDateString()}
+              </p>
             </div>
           </Section>
         </div>
@@ -489,7 +604,13 @@ function Drawer({ selected, close }: { selected: Astrologer; close: () => void }
 }
 
 /* -------------------- SECTION -------------------- */
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <h4 className="font-semibold text-gray-800 mb-2 border-l-4 border-yellow-400 pl-2">

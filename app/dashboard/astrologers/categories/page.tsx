@@ -17,7 +17,7 @@ export default function CategoriesPage() {
   const [searchAll, setSearchAll] = useState("");
   const [searchUsed, setSearchUsed] = useState("");
 
-  // ✅ Make categories stateful so toggle works
+  // ✅ Use useState for both category groups
   const [categories, setCategories] = useState([
     { id: 1, name: "Dishes", img: "/assets/categories/food.jpg", parent: "-", type: "Head", active: true },
     { id: 2, name: "Beauty Products", img: "/assets/categories/beauty.jpg", parent: "-", type: "Head", active: true },
@@ -41,14 +41,13 @@ export default function CategoriesPage() {
   );
 
   const toggleActive = (id: number, setFunc: any) => {
-    setFunc((prev: any) =>
-      prev.map((cat: any) =>
+    setFunc((prev: any[]) =>
+      prev.map((cat) =>
         cat.id === id ? { ...cat, active: !cat.active } : cat
       )
     );
   };
 
-  // Doughnut chart for category insights
   const categoryData = {
     labels: ["Food", "Beauty", "Fashion", "Footwear"],
     datasets: [
@@ -64,24 +63,17 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Side: Category Insights */}
+        {/* Left Panel */}
         <div className="lg:col-span-1 flex flex-col gap-6">
-          <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition">
+          <div className="bg-white p-5 rounded-xl shadow-sm">
             <h2 className="text-sm font-semibold text-gray-600 mb-3">
               Top Categories
             </h2>
-            <Doughnut
-              data={categoryData}
-              options={{
-                plugins: { legend: { position: "bottom" } },
-              }}
-            />
+            <Doughnut data={categoryData} options={{ plugins: { legend: { position: "bottom" } } }} />
           </div>
 
-          <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition">
-            <h2 className="text-sm font-semibold text-gray-600 mb-3">
-              Quick Stats
-            </h2>
+          <div className="bg-white p-5 rounded-xl shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-600 mb-3">Quick Stats</h2>
             <ul className="text-sm text-gray-700 space-y-2">
               <li>🟢 Active Categories: <b>7</b></li>
               <li>🔴 Inactive Categories: <b>2</b></li>
@@ -90,10 +82,10 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        {/* Right Side: Tables */}
+        {/* Right Panel */}
         <div className="lg:col-span-3 flex flex-col gap-6">
           {/* All Categories Table */}
-          <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition">
+          <div className="bg-white p-5 rounded-xl shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-800">All Categories</h2>
               <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-80">
@@ -126,15 +118,9 @@ export default function CategoriesPage() {
                 renderRow={(item) => (
                   <tr key={item.id} className="border-b last:border-0 hover:bg-gray-50 transition">
                     <td className="px-4 py-3">
-                      <img
-                        src={item.img}
-                        alt={item.name}
-                        className="w-10 h-10 rounded-md object-cover border border-gray-200"
-                      />
+                      <img src={item.img} alt={item.name} className="w-10 h-10 rounded-md object-cover border border-gray-200" />
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-800">
-                      {item.name}
-                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-800">{item.name}</td>
                     <td className="px-4 py-3 text-gray-600">{item.parent}</td>
                     <td className="px-4 py-3 text-gray-600">{item.type}</td>
                     <td className="px-4 py-3">
@@ -162,7 +148,7 @@ export default function CategoriesPage() {
           </div>
 
           {/* Used Categories Table */}
-          <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition">
+          <div className="bg-white p-5 rounded-xl shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-800">Used By You Categories</h2>
               <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-80">
@@ -195,15 +181,9 @@ export default function CategoriesPage() {
                 renderRow={(item) => (
                   <tr key={item.id} className="border-b last:border-0 hover:bg-gray-50 transition">
                     <td className="px-4 py-3">
-                      <img
-                        src={item.img}
-                        alt={item.name}
-                        className="w-10 h-10 rounded-md object-cover border border-gray-200"
-                      />
+                      <img src={item.img} alt={item.name} className="w-10 h-10 rounded-md object-cover border border-gray-200" />
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-800">
-                      {item.name}
-                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-800">{item.name}</td>
                     <td className="px-4 py-3 text-gray-600">{item.parent}</td>
                     <td className="px-4 py-3 text-gray-600">{item.type}</td>
                     <td className="px-4 py-3">
