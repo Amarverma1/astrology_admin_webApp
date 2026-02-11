@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = axios.create({
+const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000",
   headers: {
     "Content-Type": "application/json",
@@ -11,7 +11,7 @@ const api = axios.create({
 /**
  * 🔐 Attach JWT token to every request
  */
-api.interceptors.request.use(
+apiClient.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
@@ -27,7 +27,7 @@ api.interceptors.request.use(
 /**
  * 🚨 Global response handler (optional but recommended)
  */
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 401) {
@@ -41,4 +41,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default apiClient;
