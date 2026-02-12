@@ -191,14 +191,12 @@ export default function Sidebar({ activePath }: SidebarProps) {
           <div className="flex items-center gap-3">
             <div className="w-20 h-15 rounded-lg flex items-center justify-center overflow-hidden">
               <img
-                src="/assets/logo.png"
+                src="/assets/logo1.png"
                 alt="Logo"
                 className="w-18 h-18 object-contain"
               />
             </div>
-            <span className="text-lg font-semibold text-gray-800">
-              Sri Mangalam
-            </span>
+           
           </div>
         </div>
 
