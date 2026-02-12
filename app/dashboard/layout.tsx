@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const token = localStorage.getItem("adminToken");
     if (!token) {
-      router.replace("/login");
+      router.replace("//login");
     } else {
       setLoading(false);
     }
@@ -31,25 +32,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!messaging) return;
 
     // ✅ Register Firebase Service Worker (for background notifications)
-   // In DashboardLayout useEffect
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/firebase-messaging-sw.js")
-    .then((registration) => {
-      console.log("SW registered:", registration);
+    // In DashboardLayout useEffect
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/firebase-messaging-sw.js")
+        .then((registration) => {
+          console.log("SW registered:", registration);
 
-      // Make it take control immediately
-      registration.update();
-      if (registration.waiting) {
-        registration.waiting.postMessage({ type: "SKIP_WAITING" });
-      }
+          // Make it take control immediately
+          registration.update();
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: "SKIP_WAITING" });
+          }
 
-      navigator.serviceWorker.ready.then((reg) => {
-        console.log("SW ready:", reg);
-      });
-    })
-    .catch((err) => console.error("SW registration failed:", err));
-}
+          navigator.serviceWorker.ready.then((reg) => {
+            console.log("SW ready:", reg);
+          });
+        })
+        .catch((err) => console.error("SW registration failed:", err));
+    }
 
 
     // ✅ Listen for foreground messages
@@ -57,9 +58,9 @@ if ("serviceWorker" in navigator) {
       console.log("📩 Foreground notification received:", payload);
 
       if (Notification.permission === "granted") {
-        new Notification(payload.notification?.title || "LMPIO", {
+        new Notification(payload.notification?.title || "Nakshtra Sutra", {
           body: payload.notification?.body,
-          icon: "/logo.png",
+          icon: "/logo1.png",
         });
       }
 
@@ -86,11 +87,14 @@ if ("serviceWorker" in navigator) {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar activePath={pathname} />
-      <div className="flex-1 ml-64 flex flex-col">
-        <Topbar />
-        <main className="p-8">{children}</main>
-      </div>
-    </div>
+  <Sidebar />
+  <div className="flex-1 flex flex-col lg:ml-60">
+    <Topbar />
+    <main className="p-2 sm:p-6 lg:p-8">
+      {children}
+    </main>
+  </div>
+</div>
+
   );
 }

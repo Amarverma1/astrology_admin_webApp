@@ -1,31 +1,59 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
-  UserCheck,
-  Users,
-  Calendar,
-  BookOpen,
+  Package,
+  ShoppingBag,
+  BarChart3,
   Settings,
   LogOut,
   ChevronDown,
   ChevronUp,
-  Sparkles,
+  Box,
+  FileText,
+  Activity,
   IndianRupee,
+  Users,
+  BookOpen,
+  Calendar,
+  UserCheck,
   Layers,
+  Sparkles,
   User,
   Cpu,
+  MapPin,
   Bell,
+  Gift,
+  Star,
   MessageCircle,
+  Repeat
 } from "lucide-react";
 import { useState, useEffect } from "react";
-
-/* ✅ Add prop type */
-interface SidebarProps {
-  activePath: string;
-}
 
 interface NavItem {
   href?: string;
@@ -33,7 +61,6 @@ interface NavItem {
   icon: any;
   submenu?: { href: string; label: string }[];
 }
-
 /* ✅ Keep all your menu structure */
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -143,8 +170,8 @@ const navItems: NavItem[] = [
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
 ];
 
-/* ✅ Sidebar component now typed */
-export default function Sidebar({ activePath }: SidebarProps) {
+export default function Sidebar() {
+  const pathname = usePathname();
   const router = useRouter();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -153,12 +180,12 @@ export default function Sidebar({ activePath }: SidebarProps) {
   useEffect(() => {
     const newOpenMenus: { [key: string]: boolean } = {};
     navItems.forEach((item) => {
-      if (item.submenu?.some((sub) => activePath.startsWith(sub.href))) {
+      if (item.submenu?.some((sub) => pathname.startsWith(sub.href))) {
         newOpenMenus[item.label] = true;
       }
     });
     setOpenMenus(newOpenMenus);
-  }, [activePath]);
+  }, [pathname]);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -182,47 +209,42 @@ export default function Sidebar({ activePath }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-100 z-20 flex flex-col transform transition-transform lg:translate-x-0 ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full w-60 bg-white 
+          border-r border-gray-100 z-20 flex flex-col 
+          transform transition-transform lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-20 h-15 rounded-lg flex items-center justify-center overflow-hidden">
-              <img
-                src="/assets/logo1.png"
-                alt="Logo"
-                className="w-18 h-18 object-contain"
-              />
-            </div>
-           
-          </div>
+        <div className="p-6 border-b border-gray-100 ">
+
+
+          <img src="/assets/logo1.png" alt="Ns Logo" className="w-30 h-18 object-contain" />
         </div>
 
-        {/* Navigation */}
+
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto hide-scrollbar">
           {navItems.map((item) => {
             const isActive = item.href
-              ? activePath === item.href
-              : item.submenu?.some((sub) => activePath.startsWith(sub.href));
+              ? pathname === item.href
+              : item.submenu?.some((sub) => pathname.startsWith(sub.href));
             return (
               <div key={item.label}>
                 <div
-                  className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer font-medium text-sm transition-all ${
-                    isActive
+                  className={`flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer font-medium text-[14px]
+                  transition-all ${isActive
                       ? "bg-red-50 text-red-600 font-semibold"
                       : "text-gray-600 hover:bg-gray-50 hover:text-red-600"
-                  }`}
+                    }`}
                   onClick={() => {
                     if (item.submenu) {
                       toggleMenu(item.label);
                     } else if (item.href) {
-                      router.push(item.href);
-                      setMobileOpen(false);
+                      router.push(item.href); // ✅ NAVIGATE
+                      setMobileOpen(false);    // ✅ close mobile sidebar
                     }
                   }}
                 >
+
                   <div className="flex items-center gap-3">
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span>{item.label}</span>
@@ -244,11 +266,11 @@ export default function Sidebar({ activePath }: SidebarProps) {
                       <Link
                         key={sub.href}
                         href={sub.href}
-                        className={`px-3 py-2 text-sm rounded-lg transition-all ${
-                          activePath === sub.href
-                            ? "bg-red-100 text-red-600 font-semibold"
+                        className={`px-3 py-1.5 text-[13px] rounded-md transition-all
+                       ${pathname === sub.href
+                            ? "bg-red-100 text-red-600 "
                             : "text-gray-600 hover:bg-gray-50 hover:text-red-600"
-                        }`}
+                          }`}
                       >
                         {sub.label}
                       </Link>
@@ -259,6 +281,7 @@ export default function Sidebar({ activePath }: SidebarProps) {
             );
           })}
         </nav>
+
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-100 mt-auto shrink-0">
@@ -271,6 +294,7 @@ export default function Sidebar({ activePath }: SidebarProps) {
           </button>
         </div>
       </aside>
+
     </>
   );
 }
