@@ -193,7 +193,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("seller");
+    localStorage.removeItem("admin_info");
     router.replace("/login");
   };
 
@@ -218,7 +218,7 @@ export default function Sidebar() {
         <div className="p-6 border-b border-gray-100 ">
 
 
-          <img src="/assets/logo1.png" alt="Ns Logo" className="w-30 h-18 object-contain" />
+          <img src="/assets/logo.png" alt="Sri Logo" className="w-30 h-18 object-contain" />
         </div>
 
 
