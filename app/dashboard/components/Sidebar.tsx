@@ -31,6 +31,7 @@ import {
   ShoppingBag,
   BarChart3,
   Settings,
+  ShoppingCart,
   LogOut,
   ChevronDown,
   ChevronUp,
@@ -106,12 +107,36 @@ const navItems: NavItem[] = [
   },
 
   {
-    label: "Pooja & Remedies",
+    label: "Pooja & Temple",
     icon: Sparkles,
     submenu: [
-      { href: "/admin/pooja", label: "All Poojas" },
-      { href: "/admin/remedies", label: "Remedies" },
-      { href: "/admin/orders", label: "Pooja Orders" },
+      { href: "/dashboard/pooja", label: "All Poojas" },
+      { href: "/dashboard/temple", label: "All Temple" },
+    
+    ],
+  },
+
+  {
+  label: "Orders",
+  icon: ShoppingCart, // you can change icon if needed
+  submenu: [
+    { href: "/dashboard/orders", label: "Product Orders" },
+    { href: "/dashboard/pooja-orders", label: "Pooja Orders" },
+     { href: "/dashboard/pandit-bookings", label: "Pandit Bookings" },
+      { href: "/dashboard/temple-bookings", label: "Temple Bookings Orders" },
+   
+  ],
+},
+
+  {
+    label: "Catalog",
+    icon: Package,
+    submenu: [
+      { href: "/dashboard/categories", label: "All Categories" },
+      { href: "/dashboard/categories/add", label: "Add Category" },
+
+      { href: "/dashboard/products", label: "All Products" },
+      { href: "/dashboard/products/add", label: "Add Product" },
     ],
   },
 
