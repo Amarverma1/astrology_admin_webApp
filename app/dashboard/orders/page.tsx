@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Eye, FileDown } from "lucide-react";
+import { Search, Eye, FileDown, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import PaginatedTable from "../components/PaginatedTable";
@@ -105,11 +106,11 @@ export default function AllOrdersPage() {
   const handleStatusChange = async (newStatus: string) => {
     try {
       await axios.put(
-        `${API_BASE}/admin/orders/${selectedOrder.rawId}/status`,
+        `${API_BASE}/order/admin/orders/${selectedOrder.rawId}/status`,
         { status: newStatus.toLowerCase() },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("admintoken")}`,
           },
         }
       );
@@ -125,6 +126,27 @@ export default function AllOrdersPage() {
       setSelectedOrder({ ...selectedOrder, status: newStatus });
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteOrder = async (order: any) => {
+    const confirmDelete = confirm("Are you sure you want to delete this order?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${API_BASE}/order/admin/orders/${order.rawId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
+
+      // remove from UI
+      setOrders((prev) => prev.filter((o) => o.rawId !== order.rawId));
+
+      toast.success("Order deleted successfully");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Failed to delete order");
     }
   };
 
@@ -226,16 +248,26 @@ export default function AllOrdersPage() {
                         {o.status}
                       </span>
                     </td>
-                    <td>
-                      <button
-                        onClick={() => {
-                          setSelectedOrder(o);
-                          setOpenDrawer(true);
-                        }}
-                      >
-                        <Eye className="w-4 h-4 text-red-600" />
-                      </button>
-                    </td>
+                    <td className="flex gap-3 items-center">
+  {/* VIEW */}
+  <button
+    onClick={() => {
+      setSelectedOrder(o);
+      setOpenDrawer(true);
+    }}
+    className="hover:scale-110 transition"
+  >
+    <Eye className="w-4 h-4 text-blue-600" />
+  </button>
+
+  {/* DELETE */}
+  <button
+    onClick={() => handleDeleteOrder(o)}
+    className="hover:scale-110 transition"
+  >
+    <Trash2 className="w-4 h-4 text-red-600" />
+  </button>
+</td>
                   </tr>
                 )}
               />
@@ -267,7 +299,7 @@ export default function AllOrdersPage() {
             <option>Cancelled</option>
           </select>
 
-         
+
 
           <button
             onClick={() => setOpenDrawer(false)}
